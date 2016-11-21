@@ -10,7 +10,7 @@ package org.hathitrust.htrc.textprocessing.runningheaders
   */
 class Line(val text: String, val lineNumber: Int, val pageSeq: String) {
 
-  import edu.illinois.i3.scala.utils.implicits.StringsImplicits._
+  import org.hathitrust.htrc.tools.scala.implicits.StringsImplicits._
 
   import scala.math.max
 

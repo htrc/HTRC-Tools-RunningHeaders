@@ -83,7 +83,7 @@ object PageStructureParser {
     * @return The clustered lines
     */
   protected def clusterLines(lines: List[(Line, Line)]): Set[ListBuffer[Line]] = {
-    import edu.illinois.i3.scala.utils.implicits.AnyRefImplicits._
+    import org.hathitrust.htrc.tools.scala.implicits.AnyRefImplicits._
 
     val clusterMap = mutable.HashMap.empty[Line, mutable.ListBuffer[Line]]
 
