@@ -13,9 +13,9 @@ To use via Maven:
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>running-headers_2.11</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6</version>
 </dependency>
 ```
 
 To use via SBT:
-`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "0.6.0-SNAPSHOT"`
+`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "0.6"`
