@@ -45,7 +45,6 @@ lazy val `running-headers` = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "running-headers",
-    version := "0.6.0-SNAPSHOT",
     description := "Library that performs header/body/footer identification " +
       "over a set of pages in a volume",
     licenses += "Apache2" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
