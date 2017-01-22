@@ -4,18 +4,28 @@ Utility library that can be used for performing header/body/footer identificatio
 # Build
 * To generate a package that can be referenced from other projects:  
   `sbt test package`  
-  then find the result in `target/scala-2.11/` (or similar) folder.
+  then find the result in `target/scala-2.12/` (or similar) folder.
 
 # Usage
 
-To use via Maven:
+## SBT  
+`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "0.7"`
+
+## Maven
+**Scala 2.11.x**
 ```
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>running-headers_2.11</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
 </dependency>
 ```
 
-To use via SBT:  
-`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "0.7-SNAPSHOT"`
+**Scala 2.12.x**
+```
+<dependency>
+    <groupId>org.hathitrust.htrc</groupId>
+    <artifactId>running-headers_2.12</artifactId>
+    <version>0.7</version>
+</dependency>
+```
