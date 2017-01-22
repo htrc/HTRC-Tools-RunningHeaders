@@ -14,12 +14,12 @@ class Line(val text: String, val lineNumber: Int, val pageSeq: String) {
 
   import scala.math.max
 
-  protected[runningheaders] var isHeader = false
-  protected[runningheaders] var isFooter = false
+  protected[runningheaders] var isHeader: Boolean = false
+  protected[runningheaders] var isFooter: Boolean = false
 
   // trim string, lowercase, replace multiple whitespaces with single whitespace, and
   // remove punctuation and numbers
-  protected[runningheaders] lazy val cleanedText =
+  protected[runningheaders] lazy val cleanedText: String =
     text.replaceAll("""[^\p{L}\s]+""", "").replaceAll("""\s{2,}""", " ").trim.toLowerCase
 
   /**
