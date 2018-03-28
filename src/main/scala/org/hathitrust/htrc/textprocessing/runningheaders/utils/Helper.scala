@@ -14,7 +14,7 @@ object Helper {
     * @param elements The elements
     * @return A list of pairs of elements that are no farther than `n` apart
     */
-  def pairwiseCombineElementsWithinDistanceOf[T](n: Int)(elements: Seq[T]): List[(T, T)] = {
+  def pairwiseCombineElementsWithinDistanceOf[T](n: Int)(elements: List[T]): List[(T, T)] = {
     var x = elements.head
     var xs = elements.tail
     var result = List.empty[(T, T)]

@@ -7,33 +7,17 @@ import scala.collection.mutable.ListBuffer
 
 object PageStructureParser {
 
-  /**
-    * Method for parsing a sequence of `Page`s to identify running headers and footers
-    *
-    * @param pages              The pages to compute structure for
-    * @param windowSize         How far should similarity scores be computed from the current page
-    * @param minClusterSize     The minimum number of pages required in a cluster before the cluster
-    *                           is deemed as containing a true running header or footer
-    * @param minSimilarityScore The minimum score required for two candidate headers to be deemed
-    *                           as being the same
-    * @param maxNumHeaderLines  The maximum number of lines from the top of the page to consider
-    *                           as a candidate header
-    * @param maxNumFooterLines  The maximum number of lines from the bottom of the page to consider
-    *                           as a candidate footer
-    * @return A new sequence of Pages with additional structure-retrieving methods
-    */
-  def parsePageStructure(pages: Seq[Page],
-                         windowSize: Int = 6,
-                         minSimilarityScore: Double = 0.7d,
-                         minClusterSize: Int = 3,
-                         maxNumHeaderLines: Int = 3,
-                         maxNumFooterLines: Int = 3): Seq[Page with PageWithStructure] = {
+  def parsePageStructure[T <: Page](pages: Seq[T],
+                                    windowSize: Int = 6,
+                                    minSimilarityScore: Double = 0.7d,
+                                    minClusterSize: Int = 3,
+                                    maxNumHeaderLines: Int = 3,
+                                    maxNumFooterLines: Int = 3): Seq[PageWithStructure[T]] = {
 
-    // Ignore lines that are <4 characters long and/or have no alphabetic characters
     val candidateHeaderLines =
-      pages.map(_.lines.take(maxNumHeaderLines).filterNot(_.cleanedText.length < 4))
+      pages.map(_.lines.take(maxNumHeaderLines).filterNot(_.cleanedText.length < 4)).toList
     val candidateFooterLines =
-      pages.map(_.lines.takeRight(maxNumFooterLines).filterNot(_.cleanedText.length < 4))
+      pages.map(_.lines.takeRight(maxNumFooterLines).filterNot(_.cleanedText.length < 4)).toList
 
     val headersForComparison =
       Helper.pairwiseCombineElementsWithinDistanceOf(windowSize)(candidateHeaderLines)
@@ -58,22 +42,45 @@ object PageStructureParser {
     val headerClusters = clusterLines(headerLineSimiarities).filter(_.size >= minClusterSize)
     val footerClusters = clusterLines(footerLineSimilarities).filter(_.size >= minClusterSize)
 
-    // Mark each line in the clusters as being part of the header or footer
-    headerClusters.flatten.foreach(_.isHeader = true)
-    footerClusters.flatten.foreach(_.isFooter = true)
+    val lastHeaderLineForPage =
+      headerClusters
+        .flatten
+        .groupBy(_.page)
+        .mapValues(lines => lines.maxBy(_.lineNumber).lineNumber)
 
-    // Loop through all pages to mark all the lines above (below) the last (first) line marked as
-    // a header (footer) as being also part of the header (footer)
-    for (page <- pages) {
-      page.lines.take(maxNumHeaderLines).reverse.dropWhile(l => !l.isHeader).foreach(_.isHeader = true)
-      page.lines.takeRight(maxNumFooterLines).dropWhile(l => !l.isFooter).foreach(_.isFooter = true)
-    }
+    val firstFooterLineForPage =
+      footerClusters
+        .flatten
+        .groupBy(_.page)
+        .mapValues(lines => lines.minBy(_.lineNumber).lineNumber)
 
-    // Return a new `Page` object with the additional structure access methods
-    pages.map(p => new Page(p.lines, p.pageSeq) with PageWithStructure {
-      override protected[runningheaders] val MaxNumHeaderLines: Int = maxNumHeaderLines
-      override protected[runningheaders] val MaxNumFooterLines: Int = maxNumFooterLines
-    })
+    pages
+      .map { page =>
+        val lastHeaderLine = lastHeaderLineForPage.get(page)
+        val firstFooterLine = firstFooterLineForPage.get(page)
+
+        val pageWithStructure = new PageWithStructure[T] {
+          override def underlying: T = page
+
+          private val numHeaderLines = lastHeaderLine.map(_ + 1).getOrElse(0)
+          private val numFooterLines = firstFooterLine.map(underlying.textLines.length - _).getOrElse(0)
+
+          override def hasHeader: Boolean = numHeaderLines > 0
+
+          override def hasFooter: Boolean = numFooterLines > 0
+
+          override def headerLines: Array[String] =
+            underlying.textLines.take(numHeaderLines)
+
+          override def bodyLines: Array[String] =
+            underlying.textLines.slice(numHeaderLines, underlying.textLines.length - numFooterLines)
+
+          override def footerLines: Array[String] =
+            underlying.textLines.takeRight(numFooterLines)
+        }
+
+        pageWithStructure
+      }
   }
 
   /**
