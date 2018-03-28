@@ -25,7 +25,7 @@ private[runningheaders] class Line(val text: String, val lineNumber: Int, val pa
   }
 
   override def hashCode(): Int = {
-    val state = Seq(lineNumber, page)
+    val state = Seq(lineNumber.asInstanceOf[Object], page.asInstanceOf[Object])
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 

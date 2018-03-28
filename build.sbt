@@ -37,7 +37,11 @@ lazy val commonSettings = Seq(
     ("Git-Version", git.gitDescribedVersion.value.getOrElse("N/A")),
     ("Git-Dirty", git.gitUncommittedChanges.value.toString),
     ("Build-Date", new java.util.Date().toString)
-  )
+  ),
+  wartremoverErrors ++= Warts.unsafe.diff(Seq(
+    Wart.DefaultArguments,
+    Wart.NonUnitStatements
+  ))
 )
 
 lazy val `running-headers` = (project in file(".")).

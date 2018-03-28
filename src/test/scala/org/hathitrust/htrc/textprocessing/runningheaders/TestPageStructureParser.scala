@@ -8,6 +8,7 @@ import org.scalatest.prop.PropertyChecks
 import scala.io.{Codec, Source}
 import scala.util.Try
 
+@SuppressWarnings(Array("org.wartremover.warts.Any", "org.wartremover.warts.TryPartial"))
 class TestPageStructureParser extends FlatSpec
   with PropertyChecks with ParallelTestExecution {
 
