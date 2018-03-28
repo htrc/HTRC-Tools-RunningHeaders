@@ -3,17 +3,48 @@ package org.hathitrust.htrc.textprocessing.runningheaders
 /**
   * Trait that adds methods for retrieving the header, body, and footer elements of a page
   */
-trait PageWithStructure extends Page {
+trait PageWithStructure[T] {
+  /**
+    * Returns the underlying page
+    *
+    * @return The underlying page
+    */
+  def underlying: T
 
-  protected[runningheaders] val MaxNumHeaderLines: Int
-  protected[runningheaders] val MaxNumFooterLines: Int
+  /**
+    * Tests whether the page contains an identified header
+    *
+    * @return True if the page contains an identified header, false otherwise
+    */
+  def hasHeader: Boolean
+
+  /**
+    * Tests whether the page contains an identified footer
+    *
+    * @return True if the page contains an identified footer, false otherwise
+    */
+  def hasFooter: Boolean
 
   /**
     * Returns the sequence of lines from the page representing the header
     *
     * @return The sequence of lines from the page representing the header
     */
-  def getHeader: Seq[Line] = lines.takeWhile(_.isHeader)
+  def headerLines: Seq[String]
+
+  /**
+    * Returns the sequence of lines from the page representing the body
+    *
+    * @return The sequence of lines from the page representing the body
+    */
+  def bodyLines: Seq[String]
+
+  /**
+    * Returns the sequence of lines from the page representing the footer
+    *
+    * @return The sequence of lines from the page representing the footer
+    */
+  def footerLines: Seq[String]
 
   /**
     * Returns the page header text
@@ -21,14 +52,7 @@ trait PageWithStructure extends Page {
     * @param sep (Optional) The separator to use for joining the header lines
     * @return The page header text
     */
-  def getHeaderText(sep: String = "\n"): String = getHeader.map(_.text).mkString(sep)
-
-  /**
-    * Returns the sequence of lines from the page representing the body
-    *
-    * @return The sequence of lines from the page representing the body
-    */
-  def getBody: Seq[Line] = lines.dropWhile(_.isHeader).takeWhile(!_.isFooter)
+  def header(sep: String = "\n"): String = headerLines.mkString(sep)
 
   /**
     * Returns the page body text
@@ -36,14 +60,7 @@ trait PageWithStructure extends Page {
     * @param sep (Optional) The separator to use for joining the body lines
     * @return The page body text
     */
-  def getBodyText(sep: String = "\n"): String = getBody.map(_.text).mkString(sep)
-
-  /**
-    * Returns the sequence of lines from the page representing the footer
-    *
-    * @return The sequence of lines from the page representing the footer
-    */
-  def getFooter: Seq[Line] = lines.takeRight(MaxNumFooterLines).filter(_.isFooter)
+  def body(sep: String = "\n"): String = bodyLines.mkString(sep)
 
   /**
     * Returns the page footer text
@@ -51,5 +68,5 @@ trait PageWithStructure extends Page {
     * @param sep (Optional) The separator to use for joining the footer lines
     * @return The page footer text
     */
-  def getFooterText(sep: String = "\n"): String = getFooter.map(_.text).mkString(sep)
+  def footer(sep: String = "\n"): String = footerLines.mkString(sep)
 }

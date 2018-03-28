@@ -1,10 +1,11 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
+import org.hathitrust.htrc.textprocessing.runningheaders
 import org.scalatest.{FlatSpec, ParallelTestExecution}
 import org.scalatest.Matchers._
 import org.scalatest.prop.PropertyChecks
 
-import scala.io.Codec
+import scala.io.{Codec, Source}
 import scala.util.Try
 
 class TestPageStructureParser extends FlatSpec
@@ -12,24 +13,24 @@ class TestPageStructureParser extends FlatSpec
 
   trait SampleVolume {
 
-    private def loadPages(range: Range, from: String): Try[Seq[Page]] = Try {
-      implicit val codec = Codec.UTF8
+    private def loadPages(range: Range, from: String): Try[List[Page]] = Try {
+      implicit val codec: Codec = Codec.UTF8
 
-      // load the sample test volume from the resources folder
-      val pageSeq = range.map(_.toString)
-      val pageData = pageSeq.map(n => s"$from/$n.txt").map(getClass.getResourceAsStream)
-      val pages = pageSeq.zip(pageData).map { case (seq, data) => Page(data, seq) }
+      val pageData = range.view.map(_.toString).map(n => s"$from/$n.txt").map(getClass.getResourceAsStream).to[List]
+      val pages = pageData.map(data => new Page {
+        override val textLines: Array[String] = Source.fromInputStream(data).getLines().toArray
+      })
 
       pages
     }
 
-    val pages = loadPages(1 to 9, "/vol1").get
+    val pages: List[Page] = loadPages(1 to 9, "/vol1").get
   }
 
   "Running headers" should "be correctly identified" in new SampleVolume {
-    val structuredPages = PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[PageWithStructure[Page]] = PageStructureParser.parsePageStructure(pages)
 
-    structuredPages.map(_.getHeaderText("|")) should contain theSameElementsInOrderAs Seq(
+    structuredPages.map(_.header("|")) should contain theSameElementsInOrderAs Seq(
       "",
       "CHAPTER 1|INTRODUCTION TO RUNNING HEADERS|Lorem Ipsum style",
       "1 INTRODUCTION TO RUNNING HEADERS|Lorem Ipsum style",
@@ -43,9 +44,9 @@ class TestPageStructureParser extends FlatSpec
   }
 
   "Running footers" should "be correctly identified" in new SampleVolume {
-    val structuredPages = PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
 
-    structuredPages.map(_.getFooterText("|")) should contain theSameElementsInOrderAs Seq(
+    structuredPages.map(_.footer("|")) should contain theSameElementsInOrderAs Seq(
       "",
       "Page 2",
       "Page 3",
@@ -55,6 +56,14 @@ class TestPageStructureParser extends FlatSpec
       "Page 7",
       "Page 8",
       "Page 9"
+    )
+  }
+
+  "Page body" should "be correctly identified" in new SampleVolume {
+    val structuredPages: List[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
+
+    structuredPages.map(_.bodyLines.length) should contain theSameElementsInOrderAs Seq(
+      7, 11, 7, 7, 7, 7, 7, 7, 5
     )
   }
 }

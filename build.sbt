@@ -8,7 +8,7 @@ lazy val commonSettings = Seq(
   organization := "org.hathitrust.htrc",
   organizationName := "HathiTrust Research Center",
   organizationHomepage := Some(url("https://www.hathitrust.org/htrc")),
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.5",
   scalacOptions ++= Seq(
     "-feature",
     "-language:postfixOps",
@@ -49,9 +49,9 @@ lazy val `running-headers` = (project in file(".")).
       "over a set of pages in a volume",
     licenses += "Apache2" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
     libraryDependencies ++= Seq(
-      "org.hathitrust.htrc"           %% "scala-utils"          % "2.1",
-      "org.scalacheck"                %% "scalacheck"           % "1.13.4"      % Test,
-      "org.scalatest"                 %% "scalatest"            % "3.0.1"       % Test
+      "org.hathitrust.htrc"           %% "scala-utils"          % "2.3.0",
+      "org.scalacheck"                %% "scalacheck"           % "1.13.5"      % Test,
+      "org.scalatest"                 %% "scalatest"            % "3.0.5"       % Test
     ),
-    crossScalaVersions := Seq("2.12.1", "2.11.8")
+    crossScalaVersions := Seq("2.12.5", "2.11.12")
   )

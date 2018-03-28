@@ -1,25 +1,11 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
-/**
-  * Object defining a line of text on a page
-  *
-  * @param text       The text
-  * @param lineNumber The line number (used primarily for distinguishing lines from each other)
-  * @param pageSeq    The page (sequence) identifier (used for distinguishing lines
-  *                   on different pages)
-  */
-class Line(val text: String, val lineNumber: Int, val pageSeq: String) {
+import org.hathitrust.htrc.tools.scala.implicits.StringsImplicits._
 
-  import org.hathitrust.htrc.tools.scala.implicits.StringsImplicits._
+import scala.math.max
 
-  import scala.math.max
-
-  protected[runningheaders] var isHeader: Boolean = false
-  protected[runningheaders] var isFooter: Boolean = false
-
-  // trim string, lowercase, replace multiple whitespaces with single whitespace, and
-  // remove punctuation and numbers
-  protected[runningheaders] lazy val cleanedText: String =
+private[runningheaders] class Line(val text: String, val lineNumber: Int, val page: Page) {
+  lazy val cleanedText: String =
     text.replaceAll("""[^\p{L}\s]+""", "").replaceAll("""\s{2,}""", " ").trim.toLowerCase
 
   /**
@@ -33,24 +19,14 @@ class Line(val text: String, val lineNumber: Int, val pageSeq: String) {
       max(cleanedText.length, other.cleanedText.length)
   }
 
-  /**
-    * Defines that two lines are considered identical if the `lineNumber` and `pageSeq` match
-    *
-    * @param obj The other line
-    * @return True if the same line, False otherwise
-    */
-  override def equals(obj: Any): Boolean = obj match {
-    case that: Line =>
-      lineNumber == that.lineNumber &&
-        pageSeq == that.pageSeq
-
+  override def equals(obj: scala.Any): Boolean = obj match {
+    case that: Line => page.eq(that.page) && lineNumber == that.lineNumber
     case _ => false
   }
 
   override def hashCode(): Int = {
-    val state = Seq(lineNumber, pageSeq)
+    val state = Seq(lineNumber, page)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 
-  override def toString: String = s"Line(P$pageSeq,L$lineNumber: $text)"
 }
