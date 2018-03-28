@@ -13,10 +13,10 @@ class TestPageStructureParser extends FlatSpec
 
   trait SampleVolume {
 
-    private def loadPages(range: Range, from: String): Try[Seq[Page]] = Try {
+    private def loadPages(range: Range, from: String): Try[List[Page]] = Try {
       implicit val codec: Codec = Codec.UTF8
 
-      val pageData = range.map(_.toString).map(n => s"$from/$n.txt").map(getClass.getResourceAsStream)
+      val pageData = range.view.map(_.toString).map(n => s"$from/$n.txt").map(getClass.getResourceAsStream).to[List]
       val pages = pageData.map(data => new Page {
         override val textLines: Array[String] = Source.fromInputStream(data).getLines().toArray
       })
@@ -24,11 +24,11 @@ class TestPageStructureParser extends FlatSpec
       pages
     }
 
-    val pages: Seq[Page] = loadPages(1 to 9, "/vol1").get
+    val pages: List[Page] = loadPages(1 to 9, "/vol1").get
   }
 
   "Running headers" should "be correctly identified" in new SampleVolume {
-    val structuredPages: Seq[PageWithStructure[Page]] = PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[PageWithStructure[Page]] = PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.header("|")) should contain theSameElementsInOrderAs Seq(
       "",
@@ -44,7 +44,7 @@ class TestPageStructureParser extends FlatSpec
   }
 
   "Running footers" should "be correctly identified" in new SampleVolume {
-    val structuredPages: Seq[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.footer("|")) should contain theSameElementsInOrderAs Seq(
       "",
@@ -60,7 +60,7 @@ class TestPageStructureParser extends FlatSpec
   }
 
   "Page body" should "be correctly identified" in new SampleVolume {
-    val structuredPages: Seq[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.bodyLines.length) should contain theSameElementsInOrderAs Seq(
       7, 11, 7, 7, 7, 7, 7, 7, 5

@@ -2,18 +2,38 @@ package org.hathitrust.htrc.textprocessing.runningheaders
 
 import org.hathitrust.htrc.textprocessing.runningheaders.utils.Helper
 
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.generic.CanBuildFrom
+import scala.collection.{SeqLike, mutable}
+import scala.language.higherKinds
 
 object PageStructureParser {
 
-  def parsePageStructure[T <: Page](pages: Seq[T],
-                                    windowSize: Int = 6,
-                                    minSimilarityScore: Double = 0.7d,
-                                    minClusterSize: Int = 3,
-                                    maxNumHeaderLines: Int = 3,
-                                    maxNumFooterLines: Int = 3): Seq[PageWithStructure[T]] = {
-
+  /**
+    * Method for parsing a sequence of `Page`s to identify running headers and footers
+    *
+    * @param pages              The pages to compute structure for
+    * @param windowSize         How far should similarity scores be computed from the current page
+    * @param minClusterSize     The minimum number of pages required in a cluster before the cluster
+    *                           is deemed as containing a true running header or footer
+    * @param minSimilarityScore The minimum score required for two candidate headers to be deemed
+    *                           as being the same
+    * @param maxNumHeaderLines  The maximum number of lines from the top of the page to consider
+    *                           as a candidate header
+    * @param maxNumFooterLines  The maximum number of lines from the bottom of the page to consider
+    *                           as a candidate footer
+    * @param cbf The builder
+    * @tparam T The type parameter for the Page
+    * @tparam C The collection type
+    * @return A new collection of Pages with additional structure-retrieving methods
+    */
+  def parsePageStructure[T <: Page, C[X] <: SeqLike[X, C[X]]](pages: C[T],
+                                                              windowSize: Int = 6,
+                                                              minSimilarityScore: Double = 0.7d,
+                                                              minClusterSize: Int = 3,
+                                                              maxNumHeaderLines: Int = 3,
+                                                              maxNumFooterLines: Int = 3)
+                                                             (implicit cbf: CanBuildFrom[C[T], PageWithStructure[T], C[PageWithStructure[T]]]): C[PageWithStructure[T]] = {
+    // Ignore lines that are <4 characters long and/or have no alphabetic characters
     val candidateHeaderLines =
       pages.map(_.lines.take(maxNumHeaderLines).filterNot(_.cleanedText.length < 4)).toList
     val candidateFooterLines =
@@ -24,7 +44,7 @@ object PageStructureParser {
     val footersForComparison =
       Helper.pairwiseCombineElementsWithinDistanceOf(windowSize)(candidateFooterLines)
 
-    val headerLineSimiarities = headersForComparison.flatMap {
+    val headerLineSimilarities = headersForComparison.flatMap {
       case (lines1, lines2) =>
         for (l1 <- lines1; l2 <- lines2; sim = l1 ~ l2 if sim >= minSimilarityScore)
           yield l1 -> l2
@@ -39,7 +59,7 @@ object PageStructureParser {
     // Cluster the lines by computing the Levenshtein distance between each pair of lines,
     // keeping together all lines that have a distance < `maxDistance`. Once clustered, keep only
     // clusters that have at least `minClusterSize` elements
-    val headerClusters = clusterLines(headerLineSimiarities).filter(_.size >= minClusterSize)
+    val headerClusters = clusterLines(headerLineSimilarities).filter(_.size >= minClusterSize)
     val footerClusters = clusterLines(footerLineSimilarities).filter(_.size >= minClusterSize)
 
     val lastHeaderLineForPage =
@@ -58,8 +78,7 @@ object PageStructureParser {
       .map { page =>
         val lastHeaderLine = lastHeaderLineForPage.get(page)
         val firstFooterLine = firstFooterLineForPage.get(page)
-
-        val pageWithStructure = new PageWithStructure[T] {
+        new PageWithStructure[T] {
           override def underlying: T = page
 
           private val numHeaderLines = lastHeaderLine.map(_ + 1).getOrElse(0)
@@ -69,17 +88,15 @@ object PageStructureParser {
 
           override def hasFooter: Boolean = numFooterLines > 0
 
-          override def headerLines: Array[String] =
+          override def headerLines: Seq[String] =
             underlying.textLines.take(numHeaderLines)
 
-          override def bodyLines: Array[String] =
+          override def bodyLines: Seq[String] =
             underlying.textLines.slice(numHeaderLines, underlying.textLines.length - numFooterLines)
 
-          override def footerLines: Array[String] =
+          override def footerLines: Seq[String] =
             underlying.textLines.takeRight(numFooterLines)
         }
-
-        pageWithStructure
       }
   }
 
@@ -89,7 +106,7 @@ object PageStructureParser {
     * @param lines The list of similar line pairs
     * @return The clustered lines
     */
-  protected def clusterLines(lines: List[(Line, Line)]): Set[ListBuffer[Line]] = {
+  protected def clusterLines(lines: List[(Line, Line)]): Set[mutable.ListBuffer[Line]] = {
     import org.hathitrust.htrc.tools.scala.implicits.AnyRefImplicits._
 
     val clusterMap = mutable.HashMap.empty[Line, mutable.ListBuffer[Line]]
