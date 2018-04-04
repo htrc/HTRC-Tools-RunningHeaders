@@ -11,13 +11,9 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.5",
   scalacOptions ++= Seq(
     "-feature",
+    "-deprecation",
     "-language:postfixOps",
-    "-language:implicitConversions",
-    "-target:jvm-1.7"
-  ),
-  javacOptions ++= Seq(
-    "-source", "1.7",
-    "-target", "1.7"
+    "-language:implicitConversions"
   ),
   resolvers ++= Seq(
     "I3 Repository" at "http://nexus.htrc.illinois.edu/content/groups/public",
@@ -46,7 +42,7 @@ lazy val commonSettings = Seq(
 
 lazy val `running-headers` = (project in file(".")).
   enablePlugins(GitVersioning, GitBranchPrompt).
-  settings(commonSettings: _*).
+  settings(commonSettings).
   settings(
     name := "running-headers",
     description := "Library that performs header/body/footer identification " +
