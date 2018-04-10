@@ -30,21 +30,21 @@ trait PageWithStructure[T] {
     *
     * @return The sequence of lines from the page representing the header
     */
-  def headerLines: Seq[String]
+  def headerLines: IndexedSeq[String]
 
   /**
     * Returns the sequence of lines from the page representing the body
     *
     * @return The sequence of lines from the page representing the body
     */
-  def bodyLines: Seq[String]
+  def bodyLines: IndexedSeq[String]
 
   /**
     * Returns the sequence of lines from the page representing the footer
     *
     * @return The sequence of lines from the page representing the footer
     */
-  def footerLines: Seq[String]
+  def footerLines: IndexedSeq[String]
 
   /**
     * Returns the page header text

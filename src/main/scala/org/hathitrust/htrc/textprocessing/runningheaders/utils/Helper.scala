@@ -14,18 +14,21 @@ object Helper {
     * @param elements The elements
     * @return A list of pairs of elements that are no farther than `n` apart
     */
-  def pairwiseCombineElementsWithinDistanceOf[T](n: Int)(elements: List[T]): List[(T, T)] = {
-    var x = elements.head
-    var xs = elements.tail
-    var result = List.empty[(T, T)]
+  @SuppressWarnings(Array("org.wartremover.warts.TraversableOps", "org.wartremover.warts.Var"))
+  def pairwiseCombineElementsWithinDistanceOf[T](n: Int)(elements: List[T]): List[(T, T)] = elements match {
+    case Nil => List.empty
+    case _ =>
+      var x = elements.head
+      var xs = elements.tail
+      var result = List.empty[(T, T)]
 
-    while (xs.nonEmpty) {
-      result ++= xs.take(n - 1).map(x -> _)
-      x = xs.head
-      xs = xs.tail
-    }
+      while (xs.nonEmpty) {
+        result ++= xs.take(n - 1).map(x -> _)
+        x = xs.head
+        xs = xs.tail
+      }
 
-    result
+      result
   }
 
 }

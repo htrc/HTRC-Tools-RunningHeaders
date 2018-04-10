@@ -8,6 +8,7 @@ import org.scalatest.prop.PropertyChecks
 import scala.io.{Codec, Source}
 import scala.util.Try
 
+@SuppressWarnings(Array("org.wartremover.warts.Any", "org.wartremover.warts.TryPartial"))
 class TestPageStructureParser extends FlatSpec
   with PropertyChecks with ParallelTestExecution {
 
@@ -18,7 +19,7 @@ class TestPageStructureParser extends FlatSpec
 
       val pageData = range.view.map(_.toString).map(n => s"$from/$n.txt").map(getClass.getResourceAsStream).to[List]
       val pages = pageData.map(data => new Page {
-        override val textLines: Array[String] = Source.fromInputStream(data).getLines().toArray
+        override val textLines: IndexedSeq[String] = Source.fromInputStream(data).getLines().toIndexedSeq
       })
 
       pages

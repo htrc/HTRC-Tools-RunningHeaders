@@ -11,13 +11,9 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.5",
   scalacOptions ++= Seq(
     "-feature",
+    "-deprecation",
     "-language:postfixOps",
-    "-language:implicitConversions",
-    "-target:jvm-1.7"
-  ),
-  javacOptions ++= Seq(
-    "-source", "1.7",
-    "-target", "1.7"
+    "-language:implicitConversions"
   ),
   resolvers ++= Seq(
     "I3 Repository" at "http://nexus.htrc.illinois.edu/content/groups/public",
@@ -37,12 +33,16 @@ lazy val commonSettings = Seq(
     ("Git-Version", git.gitDescribedVersion.value.getOrElse("N/A")),
     ("Git-Dirty", git.gitUncommittedChanges.value.toString),
     ("Build-Date", new java.util.Date().toString)
-  )
+  ),
+  wartremoverErrors ++= Warts.unsafe.diff(Seq(
+    Wart.DefaultArguments,
+    Wart.NonUnitStatements
+  ))
 )
 
 lazy val `running-headers` = (project in file(".")).
   enablePlugins(GitVersioning, GitBranchPrompt).
-  settings(commonSettings: _*).
+  settings(commonSettings).
   settings(
     name := "running-headers",
     description := "Library that performs header/body/footer identification " +
