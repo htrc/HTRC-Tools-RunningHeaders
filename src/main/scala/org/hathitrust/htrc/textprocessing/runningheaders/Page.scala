@@ -10,7 +10,7 @@ trait Page {
     *
     * @return The lines of text on the page
     */
-  def textLines: Array[String]
+  def textLines: IndexedSeq[String]
 
   /**
     * Returns the text on the page
@@ -20,7 +20,7 @@ trait Page {
     */
   def text(sep: String = "\n"): String = textLines.mkString(sep)
 
-  private[runningheaders] lazy val lines: Array[Line] =
+  private[runningheaders] lazy val lines: IndexedSeq[Line] =
     textLines.zipWithIndex.map { case (text, lineNum) => new Line(text, lineNum, this) }
 
 }

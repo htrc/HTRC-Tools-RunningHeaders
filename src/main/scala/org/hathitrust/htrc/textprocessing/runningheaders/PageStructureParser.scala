@@ -88,13 +88,13 @@ object PageStructureParser {
 
           override def hasFooter: Boolean = numFooterLines > 0
 
-          override def headerLines: Seq[String] =
+          override def headerLines: IndexedSeq[String] =
             underlying.textLines.take(numHeaderLines)
 
-          override def bodyLines: Seq[String] =
+          override def bodyLines: IndexedSeq[String] =
             underlying.textLines.slice(numHeaderLines, underlying.textLines.length - numFooterLines)
 
-          override def footerLines: Seq[String] =
+          override def footerLines: IndexedSeq[String] =
             underlying.textLines.takeRight(numFooterLines)
         }
       }
