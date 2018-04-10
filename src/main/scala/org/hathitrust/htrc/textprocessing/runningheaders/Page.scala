@@ -20,7 +20,4 @@ trait Page {
     */
   def text(sep: String = "\n"): String = textLines.mkString(sep)
 
-  private[runningheaders] lazy val lines: IndexedSeq[Line] =
-    textLines.zipWithIndex.map { case (text, lineNum) => new Line(text, lineNum, this) }
-
 }

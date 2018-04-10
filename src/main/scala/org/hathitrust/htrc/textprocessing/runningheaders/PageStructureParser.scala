@@ -33,16 +33,21 @@ object PageStructureParser {
                                                               maxNumHeaderLines: Int = 3,
                                                               maxNumFooterLines: Int = 3)
                                                              (implicit cbf: CanBuildFrom[C[T], PageWithStructure[T], C[PageWithStructure[T]]]): C[PageWithStructure[T]] = {
-    // Ignore lines that are <4 characters long and/or have no alphabetic characters
-    val candidateHeaderLines =
-      pages.map(_.lines.take(maxNumHeaderLines).filterNot(_.cleanedText.length < 4)).toList
-    val candidateFooterLines =
-      pages.map(_.lines.takeRight(maxNumFooterLines).filterNot(_.cleanedText.length < 4)).toList
+    val candidateHeaderLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
+    val candidateFooterLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
+
+    for (page <- pages) {
+      val lines = page.textLines.zipWithIndex.map { case (text, lineNum) => new Line(text, lineNum, page) }
+
+      // Ignore lines that are <4 characters long and/or have no alphabetic characters
+      candidateHeaderLines += lines.take(maxNumHeaderLines).filterNot(_.cleanedText.length < 4)
+      candidateFooterLines += lines.takeRight(maxNumFooterLines).filterNot(_.cleanedText.length < 4)
+    }
 
     val headersForComparison =
-      Helper.pairwiseCombineElementsWithinDistanceOf(windowSize)(candidateHeaderLines)
+      Helper.pairwiseCombineElementsWithinDistanceOf(windowSize)(candidateHeaderLines.toList)
     val footersForComparison =
-      Helper.pairwiseCombineElementsWithinDistanceOf(windowSize)(candidateFooterLines)
+      Helper.pairwiseCombineElementsWithinDistanceOf(windowSize)(candidateFooterLines.toList)
 
     val headerLineSimilarities = headersForComparison.flatMap {
       case (lines1, lines2) =>
@@ -79,23 +84,9 @@ object PageStructureParser {
         val lastHeaderLine = lastHeaderLineForPage.get(page)
         val firstFooterLine = firstFooterLineForPage.get(page)
         new PageWithStructure[T] {
-          override def underlying: T = page
-
-          private val numHeaderLines = lastHeaderLine.map(_ + 1).getOrElse(0)
-          private val numFooterLines = firstFooterLine.map(underlying.textLines.length - _).getOrElse(0)
-
-          override def hasHeader: Boolean = numHeaderLines > 0
-
-          override def hasFooter: Boolean = numFooterLines > 0
-
-          override def headerLines: IndexedSeq[String] =
-            underlying.textLines.take(numHeaderLines)
-
-          override def bodyLines: IndexedSeq[String] =
-            underlying.textLines.slice(numHeaderLines, underlying.textLines.length - numFooterLines)
-
-          override def footerLines: IndexedSeq[String] =
-            underlying.textLines.takeRight(numFooterLines)
+          override val underlying: T = page
+          override val numHeaderLines: Int = lastHeaderLine.map(_ + 1).getOrElse(0)
+          override val numFooterLines: Int = firstFooterLine.map(underlying.textLines.length - _).getOrElse(0)
         }
       }
   }
