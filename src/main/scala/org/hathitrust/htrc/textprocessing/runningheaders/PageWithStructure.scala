@@ -62,26 +62,23 @@ trait PageWithStructure[T <: Page] {
   def footerLines: IndexedSeq[String] = underlying.textLines.takeRight(numFooterLines)
 
   /**
-    * Returns the page header text
+    * Returns the page header text (respecting the OS-specific line separator)
     *
-    * @param sep (Optional) The separator to use for joining the header lines
-    * @return The page header text
+    * @return The page header text (respecting the OS-specific line separator)
     */
-  def header(sep: String = "\n"): String = headerLines.mkString(sep)
+  def header: String = headerLines.mkString(System.lineSeparator())
 
   /**
-    * Returns the page body text
+    * Returns the page body text (respecting the OS-specific line separator)
     *
-    * @param sep (Optional) The separator to use for joining the body lines
-    * @return The page body text
+    * @return The page body text (respecting the OS-specific line separator)
     */
-  def body(sep: String = "\n"): String = bodyLines.mkString(sep)
+  def body: String = bodyLines.mkString(System.lineSeparator())
 
   /**
-    * Returns the page footer text
+    * Returns the page footer text (respecting the OS-specific line separator)
     *
-    * @param sep (Optional) The separator to use for joining the footer lines
-    * @return The page footer text
+    * @return The page footer text (respecting the OS-specific line separator)
     */
-  def footer(sep: String = "\n"): String = footerLines.mkString(sep)
+  def footer: String = footerLines.mkString(System.lineSeparator())
 }
