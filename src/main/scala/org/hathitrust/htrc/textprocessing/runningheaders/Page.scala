@@ -12,9 +12,9 @@ trait Page {
   def textLines: Lines
 
   /**
-    * Returns the text on the page
+    * Returns the text on the page (respecting the OS-specific line separator)
     *
-    * @return The text on the page
+    * @return The text on the page (respecting the OS-specific line separator)
     */
-  def text: String = textLines.mkString("\n")
+  def text: String = textLines.mkString(System.lineSeparator())
 }
