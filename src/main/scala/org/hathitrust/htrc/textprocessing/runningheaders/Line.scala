@@ -1,6 +1,6 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
-import org.hathitrust.htrc.tools.scala.implicits.StringsImplicits._
+import org.hathitrust.htrc.textprocessing.runningheaders.utils.StringMetrics.levenshteinDistance
 
 import scala.math.max
 
@@ -15,7 +15,7 @@ private[runningheaders] class Line(val text: String, val lineNumber: Int, val pa
     * @return The similarity metric value (between 0 and 1, higher means more similar)
     */
   def ~(other: Line): Double = {
-    1 - cleanedText.editDistance(other.cleanedText).toDouble /
+    1 - levenshteinDistance(cleanedText, other.cleanedText).toDouble /
       max(cleanedText.length, other.cleanedText.length)
   }
 

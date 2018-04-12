@@ -98,15 +98,13 @@ object PageStructureParser {
     * @return The clustered lines
     */
   protected def clusterLines(lines: List[(Line, Line)]): Set[mutable.ListBuffer[Line]] = {
-    import org.hathitrust.htrc.tools.scala.implicits.AnyRefImplicits._
-
     val clusterMap = mutable.HashMap.empty[Line, mutable.ListBuffer[Line]]
 
     for ((l1, l2) <- lines) {
       val c1 = clusterMap.get(l1)
       val c2 = clusterMap.get(l2)
       (c1, c2) match {
-        case (Some(s1), Some(s2)) if s1 neq s2 =>
+        case (Some(s1), Some(s2)) if !(s1 eq s2) =>
           val (smaller, larger) = if (s1.size < s2.size) (s1, s2) else (s2, s1)
           larger ++= smaller
           smaller.foreach(clusterMap(_) = larger)
