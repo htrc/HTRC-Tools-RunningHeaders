@@ -66,19 +66,19 @@ trait PageWithStructure[T <: Page] {
     *
     * @return The page header text (respecting the OS-specific line separator)
     */
-  def header: String = headerLines.mkString(System.lineSeparator())
+  def header: String = headerLines.mkString("", System.lineSeparator(), System.lineSeparator())
 
   /**
     * Returns the page body text (respecting the OS-specific line separator)
     *
     * @return The page body text (respecting the OS-specific line separator)
     */
-  def body: String = bodyLines.mkString(System.lineSeparator())
+  def body: String = bodyLines.mkString("", System.lineSeparator(), System.lineSeparator())
 
   /**
     * Returns the page footer text (respecting the OS-specific line separator)
     *
     * @return The page footer text (respecting the OS-specific line separator)
     */
-  def footer: String = footerLines.mkString(System.lineSeparator())
+  def footer: String = footerLines.mkString("", System.lineSeparator(), System.lineSeparator())
 }
