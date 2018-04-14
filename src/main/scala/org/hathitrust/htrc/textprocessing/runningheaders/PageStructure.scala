@@ -3,7 +3,7 @@ package org.hathitrust.htrc.textprocessing.runningheaders
 /**
   * Trait that adds methods for retrieving the header, body, and footer elements of a page
   */
-trait StructuredPage extends Page {
+trait PageStructure { self: Page =>
   /**
     * Returns the number of lines comprising the header
     *

@@ -7,9 +7,11 @@ import scala.collection.{SeqLike, mutable}
 import scala.language.higherKinds
 
 object PageStructureParser {
+  type StructuredPage = Page with PageStructure
+
   protected val structuredPageBuilder: (Page, Int, Int) => StructuredPage =
     (page, headerLinesCount, footerLinesCount) =>
-      new StructuredPage {
+      new Page with PageStructure {
         override def numHeaderLines: Int = headerLinesCount
         override def numFooterLines: Int = footerLinesCount
         override def textLines: Lines = page.textLines
@@ -33,14 +35,14 @@ object PageStructureParser {
     * @tparam C The collection type
     * @return A new collection of Pages with additional structure-retrieving methods
     */
-  def parsePageStructure[T <: Page, U <: StructuredPage, C[X] <: SeqLike[X, C[X]]](pages: C[T],
-                                                                                   windowSize: Int = 6,
-                                                                                   minSimilarityScore: Double = 0.7d,
-                                                                                   minClusterSize: Int = 3,
-                                                                                   maxNumHeaderLines: Int = 3,
-                                                                                   maxNumFooterLines: Int = 3,
-                                                                                   builder: (T, Int, Int) => U = structuredPageBuilder)
-                                                                                  (implicit cbf: CanBuildFrom[C[T], U, C[U]]): C[U] = {
+  def parsePageStructure[T <: Page, U <: PageStructure, C[X] <: SeqLike[X, C[X]]](pages: C[T],
+                                                                                  windowSize: Int = 6,
+                                                                                  minSimilarityScore: Double = 0.7d,
+                                                                                  minClusterSize: Int = 3,
+                                                                                  maxNumHeaderLines: Int = 3,
+                                                                                  maxNumFooterLines: Int = 3,
+                                                                                  builder: (T, Int, Int) => U = structuredPageBuilder)
+                                                                                 (implicit cbf: CanBuildFrom[C[T], U, C[U]]): C[U] = {
     val candidateHeaderLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
     val candidateFooterLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
 
