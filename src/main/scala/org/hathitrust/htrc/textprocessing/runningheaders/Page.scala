@@ -16,5 +16,5 @@ trait Page {
     *
     * @return The text on the page (respecting the OS-specific line separator)
     */
-  def text: String = textLines.mkString(System.lineSeparator())
+  def text: String = textLines.mkString("", System.lineSeparator(), System.lineSeparator())
 }
