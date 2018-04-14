@@ -21,19 +21,25 @@ object PageStructureParser {
     * Method for parsing a sequence of `Page`s to identify running headers and footers
     *
     * @param pages              The pages to compute structure for
-    * @param windowSize         How far should similarity scores be computed from the current page
-    * @param minClusterSize     The minimum number of pages required in a cluster before the cluster
+    * @param windowSize         (optional) How far should similarity scores be computed from the current page
+    * @param minClusterSize     (optional) The minimum number of pages required in a cluster before the cluster
     *                           is deemed as containing a true running header or footer
-    * @param minSimilarityScore The minimum score required for two candidate headers to be deemed
+    * @param minSimilarityScore (optional) The minimum score required for two candidate headers to be deemed
     *                           as being the same
-    * @param maxNumHeaderLines  The maximum number of lines from the top of the page to consider
+    * @param maxNumHeaderLines  (optional) The maximum number of lines from the top of the page to consider
     *                           as a candidate header
-    * @param maxNumFooterLines  The maximum number of lines from the bottom of the page to consider
+    * @param maxNumFooterLines  (optional) The maximum number of lines from the bottom of the page to consider
     *                           as a candidate footer
-    * @param cbf                The builder
+    * @param builder            (optional) A custom builder that returns a new instance of a class deriving
+    *                           from PageStructure; the builder is given the page to build from, and two
+    *                           integers representing the number of header and footer lines on that
+    *                           page
+    * @param cbf                Implicit builder for collection type `C`
     * @tparam T The type parameter for the Page
+    * @tparam U The type parameter of the resulting structured page
     * @tparam C The collection type
-    * @return A new collection of Pages with additional structure-retrieving methods
+    * @return A new collection of pages deriving from `PageStructure` having additional
+    *         structure-retrieving methods
     */
   def parsePageStructure[T <: Page, U <: PageStructure, C[X] <: SeqLike[X, C[X]]](pages: C[T],
                                                                                   windowSize: Int = 6,
