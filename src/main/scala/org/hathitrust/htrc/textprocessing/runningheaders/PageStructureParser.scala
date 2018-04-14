@@ -7,9 +7,11 @@ import scala.collection.{SeqLike, mutable}
 import scala.language.higherKinds
 
 object PageStructureParser {
+  type StructuredPage = Page with PageStructure
+
   protected val structuredPageBuilder: (Page, Int, Int) => StructuredPage =
     (page, headerLinesCount, footerLinesCount) =>
-      new StructuredPage {
+      new Page with PageStructure {
         override def numHeaderLines: Int = headerLinesCount
         override def numFooterLines: Int = footerLinesCount
         override def textLines: Lines = page.textLines
@@ -19,28 +21,34 @@ object PageStructureParser {
     * Method for parsing a sequence of `Page`s to identify running headers and footers
     *
     * @param pages              The pages to compute structure for
-    * @param windowSize         How far should similarity scores be computed from the current page
-    * @param minClusterSize     The minimum number of pages required in a cluster before the cluster
+    * @param windowSize         (optional) How far should similarity scores be computed from the current page
+    * @param minClusterSize     (optional) The minimum number of pages required in a cluster before the cluster
     *                           is deemed as containing a true running header or footer
-    * @param minSimilarityScore The minimum score required for two candidate headers to be deemed
+    * @param minSimilarityScore (optional) The minimum score required for two candidate headers to be deemed
     *                           as being the same
-    * @param maxNumHeaderLines  The maximum number of lines from the top of the page to consider
+    * @param maxNumHeaderLines  (optional) The maximum number of lines from the top of the page to consider
     *                           as a candidate header
-    * @param maxNumFooterLines  The maximum number of lines from the bottom of the page to consider
+    * @param maxNumFooterLines  (optional) The maximum number of lines from the bottom of the page to consider
     *                           as a candidate footer
-    * @param cbf                The builder
+    * @param builder            (optional) A custom builder that returns a new instance of a class deriving
+    *                           from PageStructure; the builder is given the page to build from, and two
+    *                           integers representing the number of header and footer lines on that
+    *                           page
+    * @param cbf                Implicit builder for collection type `C`
     * @tparam T The type parameter for the Page
+    * @tparam U The type parameter of the resulting structured page
     * @tparam C The collection type
-    * @return A new collection of Pages with additional structure-retrieving methods
+    * @return A new collection of pages deriving from `PageStructure` having additional
+    *         structure-retrieving methods
     */
-  def parsePageStructure[T <: Page, U <: StructuredPage, C[X] <: SeqLike[X, C[X]]](pages: C[T],
-                                                                                   windowSize: Int = 6,
-                                                                                   minSimilarityScore: Double = 0.7d,
-                                                                                   minClusterSize: Int = 3,
-                                                                                   maxNumHeaderLines: Int = 3,
-                                                                                   maxNumFooterLines: Int = 3,
-                                                                                   builder: (T, Int, Int) => U = structuredPageBuilder)
-                                                                                  (implicit cbf: CanBuildFrom[C[T], U, C[U]]): C[U] = {
+  def parsePageStructure[T <: Page, U <: PageStructure, C[X] <: SeqLike[X, C[X]]](pages: C[T],
+                                                                                  windowSize: Int = 6,
+                                                                                  minSimilarityScore: Double = 0.7d,
+                                                                                  minClusterSize: Int = 3,
+                                                                                  maxNumHeaderLines: Int = 3,
+                                                                                  maxNumFooterLines: Int = 3,
+                                                                                  builder: (T, Int, Int) => U = structuredPageBuilder)
+                                                                                 (implicit cbf: CanBuildFrom[C[T], U, C[U]]): C[U] = {
     val candidateHeaderLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
     val candidateFooterLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
 

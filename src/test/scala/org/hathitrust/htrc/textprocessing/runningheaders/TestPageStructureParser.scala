@@ -1,5 +1,6 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
+import org.hathitrust.htrc.textprocessing.runningheaders.PageStructureParser.StructuredPage
 import org.scalatest.Matchers._
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FlatSpec, ParallelTestExecution}
