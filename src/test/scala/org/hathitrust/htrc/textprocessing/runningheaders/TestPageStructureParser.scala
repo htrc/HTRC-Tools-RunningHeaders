@@ -1,9 +1,8 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
-import org.hathitrust.htrc.textprocessing.runningheaders
-import org.scalatest.{FlatSpec, ParallelTestExecution}
 import org.scalatest.Matchers._
 import org.scalatest.prop.PropertyChecks
+import org.scalatest.{FlatSpec, ParallelTestExecution}
 
 import scala.io.{Codec, Source}
 import scala.util.Try
@@ -29,7 +28,7 @@ class TestPageStructureParser extends FlatSpec
   }
 
   "Running headers" should "be correctly identified" in new SampleVolume {
-    val structuredPages: List[PageWithStructure[Page]] = PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.headerLines.mkString("|")) should contain theSameElementsInOrderAs Seq(
       "",
@@ -45,7 +44,7 @@ class TestPageStructureParser extends FlatSpec
   }
 
   "Running footers" should "be correctly identified" in new SampleVolume {
-    val structuredPages: List[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.footerLines.mkString("|")) should contain theSameElementsInOrderAs Seq(
       "",
@@ -61,7 +60,7 @@ class TestPageStructureParser extends FlatSpec
   }
 
   "Page body" should "be correctly identified" in new SampleVolume {
-    val structuredPages: List[PageWithStructure[Page]] = runningheaders.PageStructureParser.parsePageStructure(pages)
+    val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.bodyLines.length) should contain theSameElementsInOrderAs Seq(
       7, 11, 7, 7, 7, 7, 7, 7, 5
