@@ -7,22 +7,20 @@ import scala.collection.JavaConverters._
 
 object PageStructureParser {
 
-  object StructureParserConfig {
-    def defaultConfig: StructureParserConfig =
-      new StructureParserConfig(
-        windowSize = 6,
-        minSimilarityScore = 0.7d,
-        minClusterSize = 3,
-        maxNumHeaderLines = 3,
-        maxNumFooterLines = 3
-      )
-  }
+  val defaultConfig: StructureParserConfig =
+    new StructureParserConfig(
+      windowSize = 6,
+      minSimilarityScore = 0.7d,
+      minClusterSize = 3,
+      maxNumHeaderLines = 3,
+      maxNumFooterLines = 3
+    )
 
-  sealed class StructureParserConfig(val windowSize: Int,
-                                     val minSimilarityScore: Double,
-                                     val minClusterSize: Int,
-                                     val maxNumHeaderLines: Int,
-                                     val maxNumFooterLines: Int)
+  class StructureParserConfig(val windowSize: Int,
+                              val minSimilarityScore: Double,
+                              val minClusterSize: Int,
+                              val maxNumHeaderLines: Int,
+                              val maxNumFooterLines: Int)
 
   trait StructuredPage extends Page with PageStructure
 

@@ -64,7 +64,7 @@ class TestPageStructureParser extends FlatSpec
     val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
     structuredPages.map(_.bodyLines.length) should contain theSameElementsInOrderAs Seq(
-      7, 11, 7, 7, 7, 7, 7, 7, 5
+      7, 43, 28, 26, 30, 31, 27, 28, 15
     )
   }
 }
