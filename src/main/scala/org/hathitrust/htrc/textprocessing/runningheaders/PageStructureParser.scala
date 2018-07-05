@@ -9,13 +9,12 @@ import scala.language.higherKinds
 object PageStructureParser {
   type StructuredPage = Page with PageStructure
 
-  protected val structuredPageBuilder: (Page, Int, Int) => StructuredPage =
-    (page, headerLinesCount, footerLinesCount) =>
-      new Page with PageStructure {
-        override def numHeaderLines: Int = headerLinesCount
-        override def numFooterLines: Int = footerLinesCount
-        override def textLines: Lines = page.textLines
-      }
+  protected def defaultStructuredPageBuilder(page: Page, headerLinesCount: Int, footerLinesCount: Int): StructuredPage =
+    new Page with PageStructure {
+      override def numHeaderLines: Int = headerLinesCount
+      override def numFooterLines: Int = footerLinesCount
+      override def textLines: Lines = page.textLines
+    }
 
   /**
     * Method for parsing a sequence of `Page`s to identify running headers and footers
@@ -47,7 +46,7 @@ object PageStructureParser {
                                                                                   minClusterSize: Int = 3,
                                                                                   maxNumHeaderLines: Int = 3,
                                                                                   maxNumFooterLines: Int = 3,
-                                                                                  builder: (T, Int, Int) => U = structuredPageBuilder)
+                                                                                  builder: (T, Int, Int) => U = defaultStructuredPageBuilder _)
                                                                                  (implicit cbf: CanBuildFrom[C[T], U, C[U]]): C[U] = {
     val candidateHeaderLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
     val candidateFooterLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
