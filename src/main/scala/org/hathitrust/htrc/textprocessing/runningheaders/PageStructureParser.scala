@@ -5,9 +5,12 @@ import org.hathitrust.htrc.textprocessing.runningheaders.utils.Helper
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{SeqLike, mutable}
 import scala.language.higherKinds
+import scala.util.matching.Regex
+import org.hathitrust.htrc.tools.scala.implicits.CollectionsImplicits._
 
 object PageStructureParser {
   type StructuredPage = Page with PageStructure
+  private val numberRegex: Regex = """(?<=^|\s)\p{Nd}+(?=\s|$)""".r
 
   protected def defaultStructuredPageBuilder(page: Page, headerLinesCount: Int, footerLinesCount: Int): StructuredPage =
     new Page with PageStructure {
@@ -40,6 +43,7 @@ object PageStructureParser {
     * @return A new collection of pages deriving from `PageStructure` having additional
     *         structure-retrieving methods
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def parsePageStructure[T <: Page, U <: PageStructure, C[X] <: SeqLike[X, C[X]]](pages: C[T],
                                                                                   windowSize: Int = 6,
                                                                                   minSimilarityScore: Double = 0.7d,
@@ -51,9 +55,9 @@ object PageStructureParser {
     val candidateHeaderLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
     val candidateFooterLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
 
-    for (page <- pages) {
-      val lines = page.textLines.zipWithIndex.map { case (text, lineNum) => new Line(text, lineNum, page) }
+    val pagesLines = pages.toSeq.map(page => page.textLines.zipWithIndex.map { case (text, lineNum) => new Line(text, lineNum, page) })
 
+    for (lines <- pagesLines) {
       // Ignore lines that are <4 characters long and/or have no alphabetic characters
       candidateHeaderLines += lines.take(maxNumHeaderLines).filterNot(_.cleanedText.length < 4)
       candidateFooterLines += lines.takeRight(maxNumFooterLines).filterNot(_.cleanedText.length < 4)
@@ -80,24 +84,47 @@ object PageStructureParser {
     // keeping together all lines that have a distance < `maxDistance`. Once clustered, keep only
     // clusters that have at least `minClusterSize` elements
     val headerClusters = clusterLines(headerLineSimilarities).filter(_.size >= minClusterSize)
-    val footerClusters = clusterLines(footerLineSimilarities).filter(_.size >= minClusterSize)
+    @SuppressWarnings(Array( "org.wartremover.warts.Var"))
+    var footerClusters = clusterLines(footerLineSimilarities).filter(_.size >= minClusterSize)
+
+    if (footerClusters.isEmpty) {
+      // if regular clustering didn't turn up any identified footers, try to see if
+      // page numbers can be identified and mark those as footers
+      val potentialPageNumbers =
+        pagesLines
+          .view
+          .map(_.lastOption)
+          .collect {
+            case Some(line) => line -> numberRegex.findAllIn(line.text).map(_.toInt).toList
+          }
+          .collect {
+            case (line, x :: Nil) => line -> x
+          }
+
+      footerClusters = potentialPageNumbers
+        .groupConsecutiveWhen { case ((_, n1), (_, n2)) => n2 - n1 == 1 }
+        .view
+        .map(_.map { case (line, _) => line })
+        .withFilter(_.size >= minClusterSize)
+        .to[Set]
+    }
 
     val lastHeaderLineForPage =
       headerClusters
         .flatten
         .groupBy(_.page)
-        .mapValues(lines => lines.maxBy(_.lineNumber).lineNumber)
+        .mapValues(lines => lines.maxByOpt(_.lineNumber).map(_.lineNumber))
 
     val firstFooterLineForPage =
       footerClusters
         .flatten
         .groupBy(_.page)
-        .mapValues(lines => lines.minBy(_.lineNumber).lineNumber)
+        .mapValues(lines => lines.minByOpt(_.lineNumber).map(_.lineNumber))
 
     pages
       .map { page =>
-        val lastHeaderLine = lastHeaderLineForPage.get(page)
-        val firstFooterLine = firstFooterLineForPage.get(page)
+        val lastHeaderLine = lastHeaderLineForPage.get(page).flatten
+        val firstFooterLine = firstFooterLineForPage.get(page).flatten
         val numHeaderLines = lastHeaderLine.map(_ + 1).getOrElse(0)
         val numFooterLines = firstFooterLine.map(page.textLines.length - _).getOrElse(0)
         builder(page, numHeaderLines, numFooterLines)
@@ -110,7 +137,7 @@ object PageStructureParser {
     * @param lines The list of similar line pairs
     * @return The clustered lines
     */
-  protected def clusterLines(lines: List[(Line, Line)]): Set[mutable.ListBuffer[Line]] = {
+  protected def clusterLines(lines: List[(Line, Line)]): Set[List[Line]] = {
     val clusterMap = mutable.HashMap.empty[Line, mutable.ListBuffer[Line]]
 
     for ((l1, l2) <- lines) {
@@ -137,7 +164,7 @@ object PageStructureParser {
       }
     }
 
-    clusterMap.values.toSet
+    clusterMap.valuesIterator.map(_.toList).toSet
   }
 
 }
