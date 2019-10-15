@@ -8,7 +8,7 @@ lazy val commonSettings = Seq(
   organization := "org.hathitrust.htrc",
   organizationName := "HathiTrust Research Center",
   organizationHomepage := Some(url("https://www.hathitrust.org/htrc")),
-  scalaVersion := "2.12.9",
+  scalaVersion := "2.12.10",
   scalacOptions ++= Seq(
     "-feature",
     "-deprecation",
@@ -18,7 +18,7 @@ lazy val commonSettings = Seq(
   externalResolvers ++= Seq(
     Resolver.defaultLocal,
     Resolver.mavenLocal,
-    "HTRC Nexus Repository" at "http://nexus.htrc.illinois.edu/content/groups/public"
+    "HTRC Nexus Repository" at "https://nexus.htrc.illinois.edu/content/groups/public"
   ),
   packageOptions in (Compile, packageBin) += Package.ManifestAttributes(
     ("Git-Sha", git.gitHeadCommit.value.getOrElse("N/A")),
@@ -52,9 +52,9 @@ lazy val `running-headers` = (project in file("."))
       "over a set of pages in a volume",
     licenses += "Apache2" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
     libraryDependencies ++= Seq(
-      "org.hathitrust.htrc"           %% "scala-utils"          % "2.8",
-      "org.scalacheck"                %% "scalacheck"           % "1.14.0"      % Test,
+      "org.hathitrust.htrc"           %% "scala-utils"          % "2.9",
+      "org.scalacheck"                %% "scalacheck"           % "1.14.2"      % Test,
       "org.scalatest"                 %% "scalatest"            % "3.0.8"       % Test
     ),
-    crossScalaVersions := Seq("2.12.9", "2.11.12")
+    crossScalaVersions := Seq("2.12.10", "2.11.12")
   )
