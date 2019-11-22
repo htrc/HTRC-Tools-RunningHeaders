@@ -1,11 +1,14 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
+import _root_.java.util.Scanner
+
 import org.hathitrust.htrc.textprocessing.runningheaders.PageStructureParser.StructuredPage
+import org.hathitrust.htrc.tools.scala.io.IOUtils.readLinesWithDelimiters
 import org.scalatest.Matchers._
 import org.scalatest.{FlatSpec, ParallelTestExecution}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-import scala.io.{Codec, Source}
+import scala.io.Codec
 import scala.util.Try
 
 @SuppressWarnings(Array("org.wartremover.warts.Any", "org.wartremover.warts.TryPartial"))
@@ -18,7 +21,10 @@ class TestPageStructureParser extends FlatSpec
 
       val pageData = range.view.map(_.toString).map(n => s"$from/$n.txt").map(getClass.getResourceAsStream)
       val pages = pageData.map(data => new Page {
-        override val textLines: IndexedSeq[String] = Source.fromInputStream(data).getLines().toIndexedSeq
+        override val textLines: IndexedSeq[String] = {
+          val scanner = new Scanner(data, "UTF-8")
+          readLinesWithDelimiters(scanner).toIndexedSeq
+        }
       })
 
       pages.to[List]
@@ -36,34 +42,34 @@ class TestPageStructureParser extends FlatSpec
   "Running headers" should "be correctly identified" in new SampleVol1 {
     val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
-    structuredPages.map(_.headerLines.mkString("|")) should contain theSameElementsInOrderAs Seq(
+    structuredPages.map(_.header) should contain theSameElementsInOrderAs Seq(
       "",
       "",
-      "CHAPTER 1|INTRODUCTION TO RUNNING HEADERS|Lorem Ipsum style",
-      "1 INTRODUCTION TO RUNNING HEADERS|Lorem Ipsum style",
-      "INTRODUCTION TO RUNNING HEADERS 1|Lorem Ipsum style",
-      "1 INTRODUCTION TO RUNNING HEADERS|Lorem Ipsum style",
-      "CHAPTER 2|EVERYTHING IS RELATIVE",
-      "2 EVERYTHING IS RELATIVE",
-      "EVERYTHING IS RELATIVE 2",
-      "2 EVERYTHING IS RELATIVE"
+      "CHAPTER 1\nINTRODUCTION TO RUNNING HEADERS\nLorem Ipsum style\n",
+      "1 INTRODUCTION TO RUNNING HEADERS\nLorem Ipsum style\n",
+      "INTRODUCTION TO RUNNING HEADERS 1\nLorem Ipsum style\n",
+      "1 INTRODUCTION TO RUNNING HEADERS\nLorem Ipsum style\n",
+      "CHAPTER 2\nEVERYTHING IS RELATIVE\n",
+      "2 EVERYTHING IS RELATIVE\n",
+      "EVERYTHING IS RELATIVE 2\n",
+      "2 EVERYTHING IS RELATIVE\n"
     )
   }
 
   "Running footers" should "be correctly identified" in new SampleVol1 {
     val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
-    structuredPages.map(_.footerLines.mkString("|")) should contain theSameElementsInOrderAs Seq(
+    structuredPages.map(_.footer) should contain theSameElementsInOrderAs Seq(
       "",
       "",
-      "Page 2",
-      "Page 3",
-      "Page 4",
-      "Page 5",
-      "Page 6",
-      "Page 7",
-      "Page 8",
-      "Page 9"
+      "Page 2\n",
+      "Page 3\n",
+      "Page 4\n",
+      "Page 5\n",
+      "Page 6\n",
+      "Page 7\n",
+      "Page 8\n",
+      "Page 9\n"
     )
   }
 
@@ -78,7 +84,7 @@ class TestPageStructureParser extends FlatSpec
   "Running footers" should "be correctly identified when containing page numbers" in new SampleVol2 {
     val structuredPages: List[StructuredPage] = PageStructureParser.parsePageStructure(pages)
 
-    structuredPages.map(_.footerLines.mkString("|")) should contain theSameElementsInOrderAs Seq(
+    structuredPages.map(_.footer) should contain theSameElementsInOrderAs Seq(
       "",
       "",
       "2",

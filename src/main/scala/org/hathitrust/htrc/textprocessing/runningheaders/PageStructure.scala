@@ -62,23 +62,23 @@ trait PageStructure { self: Page =>
   def footerLines: IndexedSeq[String] = textLines.takeRight(numFooterLines)
 
   /**
-    * Returns the page header text (respecting the OS-specific line separator)
+    * Returns the page header text
     *
-    * @return The page header text (respecting the OS-specific line separator)
+    * @return The page header text
     */
-  def header: String = headerLines.mkString(System.lineSeparator())
+  def header: String = headerLines.mkString
 
   /**
-    * Returns the page body text (respecting the OS-specific line separator)
+    * Returns the page body text
     *
-    * @return The page body text (respecting the OS-specific line separator)
+    * @return The page body text
     */
-  def body: String = bodyLines.mkString(System.lineSeparator())
+  def body: String = bodyLines.mkString
 
   /**
-    * Returns the page footer text (respecting the OS-specific line separator)
+    * Returns the page footer text
     *
-    * @return The page footer text (respecting the OS-specific line separator)
+    * @return The page footer text
     */
-  def footer: String = footerLines.mkString(System.lineSeparator())
+  def footer: String = footerLines.mkString
 }
