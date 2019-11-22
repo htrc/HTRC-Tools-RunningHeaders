@@ -9,7 +9,7 @@ Utility library that can be used for performing header/body/footer identificatio
 # Usage
 
 ## SBT  
-`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "1.5"`
+`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "2.0"`
 
 ## Maven
 **Scala 2.11.x**
@@ -17,7 +17,7 @@ Utility library that can be used for performing header/body/footer identificatio
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>running-headers_2.11</artifactId>
-    <version>1.5</version>
+    <version>2.0</version>
 </dependency>
 ```
 
@@ -26,6 +26,6 @@ Utility library that can be used for performing header/body/footer identificatio
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>running-headers_2.12</artifactId>
-    <version>1.5</version>
+    <version>2.0</version>
 </dependency>
 ```
