@@ -52,7 +52,7 @@ lazy val `running-headers` = (project in file("."))
       "over a set of pages in a volume",
     licenses += "Apache2" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
     libraryDependencies ++= Seq(
-      "org.hathitrust.htrc"           %% "scala-utils"          % "2.9",
+      "org.hathitrust.htrc"           %% "scala-utils"          % "2.10",
       "org.scalacheck"                %% "scalacheck"           % "1.14.2"      % Test,
       "org.scalatest"                 %% "scalatest"            % "3.0.8"       % Test
     ),
