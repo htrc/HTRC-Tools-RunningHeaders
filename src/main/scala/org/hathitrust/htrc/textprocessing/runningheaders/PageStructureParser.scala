@@ -10,7 +10,7 @@ import org.hathitrust.htrc.tools.scala.implicits.CollectionsImplicits._
 
 object PageStructureParser {
   type StructuredPage = Page with PageStructure
-  private val numberRegex: Regex = """(?<=^|\s)\p{Nd}+(?=\s|$)""".r
+  private val numberRegex: Regex = """(?<=^|\s)\p{Nd}{1,4}(?=\s|$)""".r
 
   protected def defaultStructuredPageBuilder(page: Page, headerLinesCount: Int, footerLinesCount: Int): StructuredPage =
     new Page with PageStructure {
