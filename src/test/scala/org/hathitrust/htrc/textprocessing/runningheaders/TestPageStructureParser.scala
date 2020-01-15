@@ -4,16 +4,16 @@ import _root_.java.util.Scanner
 
 import org.hathitrust.htrc.textprocessing.runningheaders.PageStructureParser.StructuredPage
 import org.hathitrust.htrc.tools.scala.io.IOUtils.readLinesWithDelimiters
-import org.scalatest.Matchers._
-import org.scalatest.{FlatSpec, ParallelTestExecution}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.ParallelTestExecution
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.io.Codec
 import scala.util.Try
 
 @SuppressWarnings(Array("org.wartremover.warts.Any", "org.wartremover.warts.TryPartial"))
-class TestPageStructureParser extends FlatSpec
-  with ScalaCheckPropertyChecks with ParallelTestExecution {
+class TestPageStructureParser extends AnyFlatSpec
+  with ParallelTestExecution {
 
   trait SampleVolume {
     protected def loadPages(range: Range, from: String): Try[List[Page]] = Try {
