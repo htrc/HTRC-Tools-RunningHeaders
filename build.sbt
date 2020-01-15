@@ -53,8 +53,8 @@ lazy val `running-headers` = (project in file("."))
     licenses += "Apache2" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
     libraryDependencies ++= Seq(
       "org.hathitrust.htrc"           %% "scala-utils"          % "2.10.1",
-      "org.scalacheck"                %% "scalacheck"           % "1.14.2"      % Test,
-      "org.scalatest"                 %% "scalatest"            % "3.0.8"       % Test
+      "org.scalacheck"                %% "scalacheck"           % "1.14.3"      % Test,
+      "org.scalatest"                 %% "scalatest"            % "3.1.0"       % Test
     ),
     crossScalaVersions := Seq("2.12.10", "2.11.12")
   )
