@@ -1,5 +1,8 @@
 /.clover/
 /.idea/
+/.bsp/
+/.metals/
+*.sublime-workspace
 *.iml
 /project/project/
 /credentials.sbt
