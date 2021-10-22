@@ -1,12 +1,11 @@
 package org.hathitrust.htrc.textprocessing.runningheaders
 
 import org.hathitrust.htrc.textprocessing.runningheaders.utils.Helper
-
-import scala.collection.generic.CanBuildFrom
-import scala.collection.{SeqLike, mutable}
-import scala.language.higherKinds
-import scala.util.matching.Regex
 import org.hathitrust.htrc.tools.scala.implicits.CollectionsImplicits._
+
+import scala.collection.compat._
+import scala.collection.mutable
+import scala.util.matching.Regex
 
 object PageStructureParser {
   type StructuredPage = Page with PageStructure
@@ -36,7 +35,7 @@ object PageStructureParser {
     *                           from PageStructure; the builder is given the page to build from, and two
     *                           integers representing the number of header and footer lines on that
     *                           page
-    * @param cbf                Implicit builder for collection type `C`
+    * @param factory                Implicit builder for collection type `C`
     * @tparam T The type parameter for the Page
     * @tparam U The type parameter of the resulting structured page
     * @tparam C The collection type
@@ -44,14 +43,14 @@ object PageStructureParser {
     *         structure-retrieving methods
     */
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  def parsePageStructure[T <: Page, U <: PageStructure, C[X] <: SeqLike[X, C[X]]](pages: C[T],
+  def parsePageStructure[T <: Page, U <: PageStructure, C[X] <: collection.Seq[X]](pages: C[T],
                                                                                   windowSize: Int = 6,
                                                                                   minSimilarityScore: Double = 0.7d,
                                                                                   minClusterSize: Int = 3,
                                                                                   maxNumHeaderLines: Int = 3,
                                                                                   maxNumFooterLines: Int = 3,
                                                                                   builder: (T, Int, Int) => U = defaultStructuredPageBuilder _)
-                                                                                 (implicit cbf: CanBuildFrom[C[T], U, C[U]]): C[U] = {
+                                                                                 (implicit factory: Factory[U, C[U]]): C[U] = {
     val candidateHeaderLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
     val candidateFooterLines = mutable.ListBuffer.empty[IndexedSeq[Line]]
 
@@ -102,24 +101,28 @@ object PageStructureParser {
           }
 
       footerClusters = potentialPageNumbers
-        .groupConsecutiveWhen { case ((_, n1), (_, n2)) => n2 - n1 == 1 }
-        .view
+        .iterator
+        .groupConsecutiveWhen[List] { case ((_, n1), (_, n2)) => n2 - n1 == 1 }
         .map(_.map { case (line, _) => line })
         .withFilter(_.size >= minClusterSize)
-        .to[Set]
+        .toSet
     }
 
     val lastHeaderLineForPage =
       headerClusters
         .flatten
         .groupBy(_.page)
+        .view
         .mapValues(lines => lines.maxByOpt(_.lineNumber).map(_.lineNumber))
+        .toMap
 
     val firstFooterLineForPage =
       footerClusters
         .flatten
         .groupBy(_.page)
+        .view
         .mapValues(lines => lines.minByOpt(_.lineNumber).map(_.lineNumber))
+        .toMap
 
     pages
       .map { page =>
@@ -129,6 +132,7 @@ object PageStructureParser {
         val numFooterLines = firstFooterLine.map(page.textLines.length - _).getOrElse(0)
         builder(page, numHeaderLines, numFooterLines)
       }
+      .to(factory)
   }
 
   /**

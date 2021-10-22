@@ -27,7 +27,7 @@ class TestPageStructureParser extends AnyFlatSpec
         }
       })
 
-      pages.to[List]
+      pages.toList
     }
   }
 

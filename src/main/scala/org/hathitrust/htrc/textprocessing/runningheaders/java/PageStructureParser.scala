@@ -3,7 +3,7 @@ package org.hathitrust.htrc.textprocessing.runningheaders.java
 import org.hathitrust.htrc.textprocessing.runningheaders.utils.TriFunction
 import org.hathitrust.htrc.textprocessing.runningheaders.{Page, PageStructure, PageStructureParser => ScalaPageStructureParser}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object PageStructureParser {
 
