@@ -1,5 +1,5 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/htrc/HTRC-Tools-RunningHeaders/ci.yml?branch=develop)](https://github.com/htrc/HTRC-Tools-RunningHeaders/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/htrc/HTRC-Tools-RunningHeaders/branch/develop/graph/badge.svg?token=2AU0ZY0EPL)](https://codecov.io/gh/htrc/HTRC-Tools-RunningHeaders)
+[![codecov](https://codecov.io/github/htrc/HTRC-Tools-RunningHeaders/branch/develop/graph/badge.svg?token=EL908DMVWS)](https://codecov.io/github/htrc/HTRC-Tools-RunningHeaders)
 [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/htrc/HTRC-Tools-RunningHeaders?include_prereleases&sort=semver)](https://github.com/htrc/HTRC-Tools-RunningHeaders/releases/latest)
 
 # HTRC-Tools-RunningHeaders
@@ -13,7 +13,7 @@ Utility library that can be used for performing header/body/footer identificatio
 # Usage
 
 ## SBT  
-`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % "2.13"`
+`libraryDependencies += "org.hathitrust.htrc" %% "running-headers" % VERSION`
 
 ## Maven
 **Scala 2.12.x**
@@ -21,7 +21,7 @@ Utility library that can be used for performing header/body/footer identificatio
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>running-headers_2.12</artifactId>
-    <version>2.13</version>
+    <version>VERSION</version>
 </dependency>
 ```
 
@@ -30,6 +30,6 @@ Utility library that can be used for performing header/body/footer identificatio
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>running-headers_2.13</artifactId>
-    <version>2.13</version>
+    <version>VERSION</version>
 </dependency>
 ```
