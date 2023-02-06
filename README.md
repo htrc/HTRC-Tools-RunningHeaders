@@ -1,3 +1,7 @@
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/htrc/HTRC-Tools-RunningHeaders/ci.yml?branch=develop)](https://github.com/htrc/HTRC-Tools-RunningHeaders/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/htrc/HTRC-Tools-RunningHeaders/branch/develop/graph/badge.svg?token=2AU0ZY0EPL)](https://codecov.io/gh/htrc/HTRC-Tools-RunningHeaders)
+[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/htrc/HTRC-Tools-RunningHeaders?include_prereleases&sort=semver)](https://github.com/htrc/HTRC-Tools-RunningHeaders/releases/latest)
+
 # HTRC-Tools-RunningHeaders
 Utility library that can be used for performing header/body/footer identification over a set of pages from a volume. The algorithm uses fuzzy string matching (using the Levenshtein distance metric) to cluster similar lines across pages within a configurable window. The algorithm is optimized to use as little memory-copying as possible, both for performance reasons and to be able to process large amounts of text.
 
