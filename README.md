@@ -1,4 +1,4 @@
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/htrc/HTRC-Tools-RunningHeaders/ci.yml?branch=develop)](https://github.com/htrc/HTRC-Tools-RunningHeaders/actions/workflows/ci.yml)
+[![Scala CI](https://github.com/htrc/HTRC-Tools-RunningHeaders/actions/workflows/ci.yml/badge.svg)](https://github.com/htrc/HTRC-Tools-RunningHeaders/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/github/htrc/HTRC-Tools-RunningHeaders/branch/develop/graph/badge.svg?token=EL908DMVWS)](https://codecov.io/github/htrc/HTRC-Tools-RunningHeaders)
 [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/htrc/HTRC-Tools-RunningHeaders?include_prereleases&sort=semver)](https://github.com/htrc/HTRC-Tools-RunningHeaders/releases/latest)
 
